@@ -1,38 +1,34 @@
 package devtrack
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
+
+	"devtrack/internal/service"
 )
 
 var startCmd = &cobra.Command{
-	Use:   "start",
+	Use:   "start [task]",
 	Short: "Start tracking a new work",
-	Long:  "Start a new work session and begin tracking",
+	Long:  "Start a new work session and begin tracking work.",
 	Args:  cobra.ExactArgs(1),
 	Run:   startTracking,
 }
 
 func startTracking(cmd *cobra.Command, args []string) {
 	task := args[0]
-
 	project, _ := cmd.Flags().GetString("project")
 
-	fmt.Println("Started tracking:", task)
-
-	if project != "" {
-		fmt.Println("Project:", project)
-	}
+	sessionService := service.NewSessionService()
+	sessionService.StartSession(task, project)
 }
 
 func init() {
 	rootCmd.AddCommand(startCmd)
 
 	startCmd.Flags().StringP(
-		"project", // flag name
-		"p",       // shorthand
-		"",        // default value
-		"Project name", //descrtiption
+		"project",
+		"p",
+		"",
+		"Project name",
 	)
 }
