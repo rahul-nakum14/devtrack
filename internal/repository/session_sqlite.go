@@ -38,4 +38,40 @@ func (r *SessionSQLiteRepository) Create(session *model.Session) error {
 	return err
 }
 
+func (r *SessionSQLiteRepository) GetActive() (*model.Session, error){	
+	row := r.db.QueryRow(`
+		SELECT id, task, project, start_time
+		FROM sessions
+		WHERE end_time IS NULL
+		ORDER BY start_time DESC
+		LIMIT 1
+	`)
+	var session model.Session
+
+	err:= row.Scan(
+		&session.ID,
+		&session.Task,
+		&session.Project,
+		&session.StartTime,
+	)
+	if err != nil{
+		return nil, err
+	}
+
+	return &session, nil;
+}
+
+func (r *SessionSQLiteRepository) Stop(session *model.Session) error {
+	now := time.Now()
+	session.EndTime = &now
+
+	_, err := r.db.Exec(
+		`UPDATE sessions SET end_time = ? WHERE id = ?`,
+		now,
+		session.ID,
+	)
+
+	return err
+}
+
 // yet to implement active and stop methsds

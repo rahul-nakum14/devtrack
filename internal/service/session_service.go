@@ -1,33 +1,90 @@
 package service
 
 import (
-	"fmt"
 	"time"
 
 	"devtrack/internal/model"
+	"devtrack/internal/repository"
 )
 
-type SessionService struct{}
-
-func NewSessionService() *SessionService {
-	return &SessionService{}
+type SessionService struct {
+	repo repository.SessionRepository
 }
 
-func (s *SessionService) StartSession(task, project string) *model.Session {
+func NewSessionService(repo repository.SessionRepository) *SessionService {
+	return &SessionService{repo: repo}
+}
+
+func (s *SessionService) StartSession(task, project string) (*model.Session, error) {
 	session := &model.Session{
 		Task:      task,
 		Project:   project,
 		StartTime: time.Now(),
 	}
 
-	fmt.Println("Session started:")
-	fmt.Println(" Task   :", session.Task)
-
-	if session.Project != "" {
-		fmt.Println(" Project:", session.Project)
+	if err := s.repo.Create(session); err != nil {
+		return nil, err
 	}
 
-	fmt.Println(" Started:", session.StartTime.Format(time.RFC3339))
-
-	return session
+	return session, nil
 }
+
+func (s *SessionService) GetActiveSession() (*model.Session, error) {
+	session, err := s.repo.GetActive()
+	if err != nil {
+		return nil, err
+	}	
+
+	return session, nil
+}
+
+func (s *SessionService) StopSession() (*model.Session, error) {
+	active, err := s.GetActiveSession()
+	if err != nil {
+		return nil, err
+	}
+
+	if active == nil {
+		return nil, errors.New("no active session to stop")
+	}
+
+	if err := s.repo.Stop(active); err != nil {
+		return nil, err
+	}
+
+	return active, nil
+}
+
+// package service
+
+// import (
+// 	"fmt"
+// 	"time"
+
+// 	"devtrack/internal/model"
+// )
+
+// type SessionService struct{}
+
+// func NewSessionService() *SessionService {
+// 	return &SessionService{}
+// }
+
+// func (s *SessionService) StartSession(task, project string) *model.Session {
+// 	session := &model.Session{
+// 		Task:      task,
+// 		Project:   project,
+// 		StartTime: time.Now(),
+// 	}
+
+// 	fmt.Println("Session started:")
+// 	fmt.Println(" Task   :", session.Task)
+
+// 	if session.Project != "" {
+// 		fmt.Println(" Project:", session.Project)
+// 	}
+
+// 	fmt.Println(" Started:", session.StartTime.Format(time.RFC3339))
+
+// 	return session
+// }
