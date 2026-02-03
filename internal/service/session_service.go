@@ -38,6 +38,22 @@ func (s *SessionService) GetActiveSession() (*model.Session, error) {
 	return session, nil
 }
 
+func (s *SessionService) StopSession() (*model.Session, error) {
+	active, err := s.GetActiveSession()
+	if err != nil {
+		return nil, err
+	}
+
+	if active == nil {
+		return nil, errors.New("no active session to stop")
+	}
+
+	if err := s.repo.Stop(active); err != nil {
+		return nil, err
+	}
+
+	return active, nil
+}
 
 // package service
 

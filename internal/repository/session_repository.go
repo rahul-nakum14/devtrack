@@ -7,5 +7,6 @@ import "devtrack/internal/model"
 type SessionRepository interface {
 	Create(session *model.Session) error
 	GetActive() (*model.Session, error)
+	Stop(session *model.Session) error
 
 }

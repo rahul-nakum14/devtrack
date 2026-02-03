@@ -61,4 +61,17 @@ func (r *SessionSQLiteRepository) GetActive() (*model.Session, error){
 	return &session, nil;
 }
 
+func (r *SessionSQLiteRepository) Stop(session *model.Session) error {
+	now := time.Now()
+	session.EndTime = &now
+
+	_, err := r.db.Exec(
+		`UPDATE sessions SET end_time = ? WHERE id = ?`,
+		now,
+		session.ID,
+	)
+
+	return err
+}
+
 // yet to implement active and stop methsds
