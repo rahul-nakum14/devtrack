@@ -29,11 +29,25 @@ func (s *SessionService) StartSession(task, project string) (*model.Session, err
 	return session, nil
 }
 
-func (s *SessionService) GetActiveSession() (*model.Session, error) {
-	session, err := s.repo.GetActive()
+func (s *SessionService) StartSession(task, project string) (*model.Session, error) {
+	active, err := s.GetActiveSession()
 	if err != nil {
 		return nil, err
-	}	
+	}
+
+	if active != nil {
+		return nil, errors.New(" session is  running")
+	}
+
+	session := &model.Session{
+		Task:      task,
+		Project:   project,
+		StartTime: time.Now(),
+	}
+
+	if err := s.repo.Create(session); err != nil {
+		return nil, err
+	}
 
 	return session, nil
 }
