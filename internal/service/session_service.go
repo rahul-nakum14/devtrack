@@ -2,9 +2,9 @@ package service
 
 import (
 	"time"
-
-	"devtrack/internal/model"
-	"devtrack/internal/repository"
+	"errors"
+"github.com/rahul-nakum14/devtrack/internal/model"
+	"github.com/rahul-nakum14/devtrack/internal/repository"
 )
 
 type SessionService struct {
@@ -15,19 +15,19 @@ func NewSessionService(repo repository.SessionRepository) *SessionService {
 	return &SessionService{repo: repo}
 }
 
-func (s *SessionService) StartSession(task, project string) (*model.Session, error) {
-	session := &model.Session{
-		Task:      task,
-		Project:   project,
-		StartTime: time.Now(),
-	}
+// func (s *SessionService) StartSession(task, project string) (*model.Session, error) {
+// 	session := &model.Session{
+// 		Task:      task,
+// 		Project:   project,
+// 		StartTime: time.Now(),
+// 	}
 
-	if err := s.repo.Create(session); err != nil {
-		return nil, err
-	}
+// 	if err := s.repo.Create(session); err != nil {
+// 		return nil, err
+// 	}
 
-	return session, nil
-}
+// 	return session, nil
+// }
 
 func (s *SessionService) StartSession(task, project string) (*model.Session, error) {
 	active, err := s.GetActiveSession()
@@ -52,6 +52,18 @@ func (s *SessionService) StartSession(task, project string) (*model.Session, err
 	return session, nil
 }
 
+func (s *SessionService) GetActiveSession() (*model.Session,error){
+	active,err := s.GetActiveSession()
+	if err != nil {
+		return nil, err
+	}
+
+	if active == nil {
+		return nil, errors.New("no active session to stop")
+	}
+
+	return active,nil
+}
 func (s *SessionService) StopSession() (*model.Session, error) {
 	active, err := s.GetActiveSession()
 	if err != nil {
@@ -68,6 +80,25 @@ func (s *SessionService) StopSession() (*model.Session, error) {
 
 	return active, nil
 }
+
+func (s *SessionService) GetTodayStats() (map[string]time.Duration, time.Duration, error) {
+	sessions, err := s.repo.GetTodaySessions()
+	if err != nil {
+		return nil, 0, err
+	}
+
+	perTask := make(map[string]time.Duration)
+	var total time.Duration
+
+	for _, session := range sessions {
+		duration := session.EndTime.Sub(session.StartTime)
+		perTask[session.Task] += duration
+		total += duration
+	}
+
+	return perTask, total, nil
+}
+
 
 // package service
 

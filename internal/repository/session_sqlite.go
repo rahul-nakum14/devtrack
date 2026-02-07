@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"devtrack/internal/model"
+	"github.com/rahul-nakum14/devtrack/internal/model"
 )
 
 type SessionSQLiteRepository struct {
@@ -38,7 +38,7 @@ func (r *SessionSQLiteRepository) Create(session *model.Session) error {
 	return err
 }
 
-func (r *SessionSQLiteRepository) GetActive() (*model.Session, error){	
+func (r *SessionSQLiteRepository) GetActiveSession() (*model.Session, error){	
 	row := r.db.QueryRow(`
 		SELECT id, task, project, start_time
 		FROM sessions
@@ -73,5 +73,42 @@ func (r *SessionSQLiteRepository) Stop(session *model.Session) error {
 
 	return err
 }
+
+func (r *SessionSQLiteRepository) GetTodaySessions() ([]*model.Session, error) {
+	rows, err := r.db.Query(`
+		SELECT id, task, project, start_time, end_time
+		FROM sessions
+		WHERE date(start_time) = date('now', 'localtime')
+		  AND end_time IS NOT NULL
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sessions []*model.Session
+
+	for rows.Next() {
+		var s model.Session
+		var endTime time.Time
+
+		err := rows.Scan(
+			&s.ID,
+			&s.Task,
+			&s.Project,
+			&s.StartTime,
+			&endTime,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		s.EndTime = &endTime
+		sessions = append(sessions, &s)
+	}
+
+	return sessions, nil
+}
+
 
 // yet to implement active and stop methsds
