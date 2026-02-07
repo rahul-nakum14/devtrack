@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"devtrack/internal/db"
-	"devtrack/internal/repository"
-	"devtrack/internal/service"
+	 "github.com/rahul-nakum14/devtrack/internal/db"
+	"github.com/rahul-nakum14/devtrack/internal/repository"
+	"github.com/rahul-nakum14/devtrack/internal/service"
 )
 
 var statsCmd = &cobra.Command{

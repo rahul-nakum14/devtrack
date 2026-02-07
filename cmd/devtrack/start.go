@@ -1,25 +1,27 @@
 package devtrack
 
 import (
+	"fmt"
+	
+	"github.com/rahul-nakum14/devtrack/internal/repository"
+	"github.com/rahul-nakum14/devtrack/internal/db"
+	"github.com/rahul-nakum14/devtrack/internal/service"
 	"github.com/spf13/cobra"
-
-	"devtrack/internal/service"
 )
 
 var startCmd = &cobra.Command{
 	Use:   "start [task]",
 	Short: "Start tracking a new work",
 	Long:  "Start a new work session and begin tracking work.",
-	Args:  cobra.ExactArgs(1),  // here it validates the args like devtrack start <1 args must here>
-	Run:   startTracking,
+	Args:  cobra.ExactArgs(1), 
+	RunE:   startTracking,
 }
 
-func startTracking(cmd *cobra.Command, args []string) {
+func startTracking(cmd *cobra.Command, args []string) error {
 	task := args[0]
 	project, _ := cmd.Flags().GetString("project")
 
 	//coonect with db and stored sessions
-
 
 	database, err := db.OpenDB()
 	if err != nil {
@@ -34,8 +36,8 @@ func startTracking(cmd *cobra.Command, args []string) {
 		return err
 	}
 
-	// sessionService := service.NewSessionService()
-	// sessionService.StartSession(task, project)
+	fmt.Println("Started tracking:", session.Task)
+	return nil
 }
 
 func init() {
