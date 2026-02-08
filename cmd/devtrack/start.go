@@ -29,8 +29,12 @@ func startTracking(cmd *cobra.Command, args []string) error {
 	}
 
 	repo := repository.NewSessionSQLiteRepository(database)
+	
 	sessionService := service.NewSessionService(repo)
 
+	if err := repo.Migrate(); err != nil {
+		return err
+	}
 	session, err := sessionService.StartSession(task, project)
 	if err != nil {
 		return err

@@ -15,7 +15,8 @@ func NewSessionSQLiteRepository(db *sql.DB) *SessionSQLiteRepository {
 	return &SessionSQLiteRepository{db: db}
 }
 
-func (r *SessionSQLiteRepository) Create(session *model.Session) error {
+
+func (r * SessionSQLiteRepository) Migrate() error{
 	query := `
 	CREATE TABLE IF NOT EXISTS sessions (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,15 +27,21 @@ func (r *SessionSQLiteRepository) Create(session *model.Session) error {
 	);
 	`
 	if _, err := r.db.Exec(query); err != nil {
+	
 		return err
 	}
 
+	return nil
+}
+
+func (r *SessionSQLiteRepository) Create(session *model.Session) error {
 	_, err := r.db.Exec(
 		`INSERT INTO sessions (task, project, start_time) VALUES (?, ?, ?)`,
 		session.Task,
 		session.Project,
 		session.StartTime,
 	)
+	
 	return err
 }
 
@@ -54,6 +61,10 @@ func (r *SessionSQLiteRepository) GetActiveSession() (*model.Session, error){
 		&session.Project,
 		&session.StartTime,
 	)
+	if err == sql.ErrNoRows {
+	
+		return nil, nil
+	}
 	if err != nil{
 		return nil, err
 	}
@@ -81,9 +92,13 @@ func (r *SessionSQLiteRepository) GetTodaySessions() ([]*model.Session, error) {
 		WHERE date(start_time) = date('now', 'localtime')
 		  AND end_time IS NOT NULL
 	`)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
+	
 	defer rows.Close()
 
 	var sessions []*model.Session
