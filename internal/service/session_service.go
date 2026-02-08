@@ -3,7 +3,7 @@ package service
 import (
 	"time"
 	"errors"
-"github.com/rahul-nakum14/devtrack/internal/model"
+	"github.com/rahul-nakum14/devtrack/internal/model"
 	"github.com/rahul-nakum14/devtrack/internal/repository"
 )
 
@@ -15,26 +15,12 @@ func NewSessionService(repo repository.SessionRepository) *SessionService {
 	return &SessionService{repo: repo}
 }
 
-// func (s *SessionService) StartSession(task, project string) (*model.Session, error) {
-// 	session := &model.Session{
-// 		Task:      task,
-// 		Project:   project,
-// 		StartTime: time.Now(),
-// 	}
-
-// 	if err := s.repo.Create(session); err != nil {
-// 		return nil, err
-// 	}
-
-// 	return session, nil
-// }
 
 func (s *SessionService) StartSession(task, project string) (*model.Session, error) {
-	active, err := s.GetActiveSession()
+	active, err := s.repo.GetActiveSession()
 	if err != nil {
 		return nil, err
 	}
-
 	if active != nil {
 		return nil, errors.New(" session is  running")
 	}
@@ -53,7 +39,7 @@ func (s *SessionService) StartSession(task, project string) (*model.Session, err
 }
 
 func (s *SessionService) GetActiveSession() (*model.Session,error){
-	active,err := s.GetActiveSession()
+	active,err := s.repo.GetActiveSession()
 	if err != nil {
 		return nil, err
 	}
@@ -64,8 +50,9 @@ func (s *SessionService) GetActiveSession() (*model.Session,error){
 
 	return active,nil
 }
+
 func (s *SessionService) StopSession() (*model.Session, error) {
-	active, err := s.GetActiveSession()
+	active, err := s.repo.GetActiveSession()
 	if err != nil {
 		return nil, err
 	}

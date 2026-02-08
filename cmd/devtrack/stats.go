@@ -2,8 +2,6 @@ package devtrack
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/spf13/cobra"
 
 	 "github.com/rahul-nakum14/devtrack/internal/db"
@@ -36,19 +34,25 @@ func statsToday(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println("Stats for today:---------->")
-
+	fmt.Println("Stats for today:")
+	
 	for task, duration := range perTask {
-		fmt.Printf("%-10s %s\n", task, duration.Round(time.Minute))
+		min := int(duration.Minutes())
+		sec := int(duration.Seconds()) % 60
+		fmt.Printf("%-10s %dm %ds\n", task, min, sec)
 	}
-
+	
 	fmt.Println("----------------")
-	fmt.Println("Total     ", total.Round(time.Minute))
+	
+	totalMin := int(total.Minutes())
+	totalSec := int(total.Seconds()) % 60
+	fmt.Printf("Total      %dm %ds\n", totalMin, totalSec)
+	
 
 	return nil
 }
 
 func init() {
-	rootCmd.AddCommand(statsCmd)
-	statsCmd.AddCommand(statsTodayCmd)
+    rootCmd.AddCommand(statsCmd)
+    statsCmd.AddCommand(statsTodayCmd)
 }
