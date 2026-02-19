@@ -86,6 +86,31 @@ func (s *SessionService) GetTodayStats() (map[string]time.Duration, time.Duratio
 	return perTask, total, nil
 }
 
+func (s *SessionService) GetWeekStats() (map[string]time.Duration, time.Duration, error) {
+
+	sessions, err := s.repo.GetWeekSessions()
+	if err != nil {
+		return nil, 0, err
+	}
+
+	perTask := make(map[string]time.Duration)
+	var total time.Duration
+
+	for _, session := range sessions {
+
+		// Skip unfinished sessions safely
+		if session.EndTime.IsZero() {
+			continue
+		}
+
+		duration := session.EndTime.Sub(session.StartTime)
+		perTask[session.Task] += duration
+		total += duration
+	}
+
+	return perTask, total, nil
+}
+
 
 // package service
 

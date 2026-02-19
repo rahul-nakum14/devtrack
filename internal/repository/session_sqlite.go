@@ -125,5 +125,40 @@ func (r *SessionSQLiteRepository) GetTodaySessions() ([]*model.Session, error) {
 	return sessions, nil
 }
 
+func (r *SessionSQLiteRepository) GetWeekSessions() ([]*model.Session, error) {
+
+	rows, err := r.db.Query(`
+		SELECT id, task, project, start_time, end_time
+		FROM sessions
+		WHERE start_time >= datetime('now', '-7 days')
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sessions []*model.Session
+
+	for rows.Next() {
+		var session model.Session
+
+		err := rows.Scan(
+			&session.ID,
+			&session.Task,
+			&session.Project,
+			&session.StartTime,
+			&session.EndTime,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		sessions = append(sessions, &session)
+	}
+
+	return sessions, nil
+}
+
+
 
 // yet to implement active and stop methsds
