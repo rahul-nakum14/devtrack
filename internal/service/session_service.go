@@ -98,11 +98,6 @@ func (s *SessionService) GetWeekStats() (map[string]time.Duration, time.Duration
 
 	for _, session := range sessions {
 
-		// Skip unfinished sessions safely
-		if session.EndTime.IsZero() {
-			continue
-		}
-
 		duration := session.EndTime.Sub(session.StartTime)
 		perTask[session.Task] += duration
 		total += duration
