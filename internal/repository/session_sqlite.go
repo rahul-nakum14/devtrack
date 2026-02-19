@@ -131,6 +131,7 @@ func (r *SessionSQLiteRepository) GetWeekSessions() ([]*model.Session, error) {
 		SELECT id, task, project, start_time, end_time
 		FROM sessions
 		WHERE start_time >= datetime('now', '-7 days')
+		AND end_time IS NOT NULL
 	`)
 	if err != nil {
 		return nil, err
