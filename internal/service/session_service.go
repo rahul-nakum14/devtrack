@@ -51,6 +51,15 @@ func (s *SessionService) GetActiveSession() (*model.Session,error){
 	return active,nil
 }
 
+func (s *SessionService) GetAllSessions() ([]*model.Session, error) {
+	allSessions,err :=  s.repo.GetAllSessions()
+	if err != nil {
+		return nil, err
+	}
+
+	return allSessions,nil
+}f
+
 func (s *SessionService) StopSession() (*model.Session, error) {
 	active, err := s.repo.GetActiveSession()
 	if err != nil {
