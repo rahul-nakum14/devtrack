@@ -1,77 +1,124 @@
-# DevTrack
+# 🚀 DevTrack
 
-DevTrack is a simple command‑line tool to track how much time you spend on development tasks.
-It works completely offline and stores data locally using SQLite.
-
----
-
-## Features
-
-- Start and stop work sessions
-- Prevent overlapping sessions
-- Track tasks with optional project names
-- View today’s work summary
-- Local SQLite database (no server required)
+**DevTrack** is a simple, lightweight command-line tool built in Go to track how much time you spend on your daily development tasks. 
 
 ---
 
-## Installation
+## ✨ Features
+
+- Track tasks with simple start and stop commands.
+- Organize task by projects.
+- View detailed session history with list.
+- Check active tasks details.
+- Get daily and weekly productivity stats.
+- Data stays on your machine (SQLite).
+---
+
+## 🛠 Installation
 
 ### Build from source
 
 ```bash
 git clone https://github.com/rahul-nakum14/devtrack.git
 cd devtrack
-go build -o devtrack
+go build -o devtrack main.go
 ```
 
-## Usage
-
-### Start tracking a task
+To run `devtrack` from any directory, move the binary to your local bin:
 ```bash
-./devtrack start <task>
-
-Example:
-./devtrack start coding
-
-Also works with project name (optional):
-./devtrack start bugs-fixes --project demoproject
+sudo mv devtrack /usr/local/bin/
 ```
 
-### Stop the active session
-```bash
-./devtrack stop
-
-This stops the currently running session and records the end time.
-```
-### View today’s stats
-
-```bash
-./devtrack stats today
-
-Stats for today:
-coding     0m 31s
-testing    11m 58s
-----------------
-Total      12m 29s
-```
 ---
 
-### Data Storage
+##  Usage
 
-DevTrack stores all data locally using SQLite.
+###  Start tracking a task
+Start a new session by providing a task name. Use the `-p` flag for a project name (optional).
 
-Database file location:
+```bash
+devtrack start "feature-ui" -p "myproject"
+
+# Output:
+
+Started tracking: feature-ui
+```
+
+###  Stop the active session
+Stops the currently running task and records the end time.
+
+```bash
+devtrack stop
+
+# Output:
+
+topped tracking: feature-ui
+```
+
+### List Active Sessions
+Quickly see which task is currently being tracked.
+
+```bash
+devtrack active
+
+# Output:
+Seesions Are feature-ui
+```
+
+###  View  stats
+Get a summary of time spent on each task today.
+
+```bash
+devtrack stats today
+
+# Output:
+Stats for today:
+feature-ui 45m 20s
+bug-fix    12m 10s
+----------------
+Total      57m 30s
+```
+
+```bash
+devtrack stats week
+
+# Output:
+Stats for last week day:
+feature-ui 45m 20s
+bug-fix    1m 10s
+----------------
+Total      5m 30s
+```
+
+---
+
+##  Available Commands
+
+| Command | Description |
+| :--- | :--- |
+| `start <task>` | Start tracking a new task |
+| `stop` | Stop the current active session |
+| `active` | Show the currently running task |
+| `list` | Show a history of all recorded sessions |
+| `stats today` | View total time spent on tasks today |
+| `stats week` | View time spent over the last 7 days |
+
+---
+
+##  Data Storage
+
+DevTrack stores all your data locally in a SQLite database
+
 ```bash
 ~/.devtrack/devtrack.db
 ```
 
-## Available Commands
+---
 
-| Command | Description |
-|--------|------------|
-| `start <task>` | Start tracking a task |
-| `stop` | Stop the active session |
-| `stats today` | Show today’s work summary |
+## Project Structure
 
-
+- `cmd/devtrack/` - CLI command logic (Cobra)
+- `internal/db/` - SQLite database initialization
+- `internal/repository/` - Database queries and data handling
+- `internal/service/` - Core business logic
+- `internal/model/` - Data structure definitions
