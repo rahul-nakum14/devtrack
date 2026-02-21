@@ -11,5 +11,6 @@ type SessionRepository interface {
 	GetTodaySessions() ([]*model.Session, error)
 	GetWeekSessions() ([]*model.Session, error)
 	GetAllSessions() ([]*model.Session, error)
+	Update(session *model.Session) error
 	Migrate()(error)
 }
