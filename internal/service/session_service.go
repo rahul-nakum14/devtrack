@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"time"
 	"errors"
 	"github.com/rahul-nakum14/devtrack/internal/model"
@@ -22,7 +23,15 @@ func (s *SessionService) StartSession(task, project string) (*model.Session, err
 		return nil, err
 	}
 	if active != nil {
-		return nil, errors.New(" session is  running")
+		// return nil, errors.New(" session is  running")
+		now := time.Now()
+		active.EndTime = &now
+	
+		if err := s.repo.Update(active); err != nil {
+			return nil, err
+		}
+	
+		fmt.Println("Stopped session:", active.Task)
 	}
 
 	session := &model.Session{
@@ -58,7 +67,7 @@ func (s *SessionService) GetAllSessions() ([]*model.Session, error) {
 	}
 
 	return allSessions,nil
-}f
+}
 
 func (s *SessionService) StopSession() (*model.Session, error) {
 	active, err := s.repo.GetActiveSession()

@@ -192,6 +192,21 @@ func (r *SessionSQLiteRepository) GetAllSessions() ([]*model.Session, error) {
 	}
 
 	return sessions, nil
+	
+}
+
+
+func (r *SessionSQLiteRepository) Update(session *model.Session) error {
+	_, err := r.db.Exec(`
+		UPDATE sessions
+		SET end_time = ?
+		WHERE id = ?
+	`,
+		session.EndTime,
+		session.ID,
+	)
+
+	return err
 }
 
 
